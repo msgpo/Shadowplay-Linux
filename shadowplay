@@ -15,9 +15,14 @@ then
 	exit 1
 fi
 
+# Monitor Number
 MONITOR_NUMBER=
 # Video Framerate
 FPS="30"
+# Size of replay buffer to save
+# Format is
+#     hh:mm:ss
+REPLAY_BUFFER="00:05:00"
 
 while [ ! $# -eq 0 ]
 do
@@ -30,11 +35,15 @@ do
 			echo "options:"
 			echo "-h,  --help               show help"
 			echo "-f,  --framerate=FPS      set framerate"
+			echo "-b,  --buffer=TIME      set replay buffer size (format hh:mm:ss)"
 			echo "-m,  --monitor-number=NUM set monitor number"
 			exit
 		;;
 		-f | --framerate)
 			FPS=$2
+		;;
+        -b | --buffer)
+			REPLAY_BUFFER=$2
 		;;
 		-m | --monitor-number)
 			MONITOR_NUMBER=$2
@@ -66,11 +75,6 @@ SOFTWARE_ENCODE=false
 # hevc
 # h265
 ENCODER_STANDARD=h264
-
-# Size of replay buffer to save
-# Format is
-#     hh:mm:ss
-REPLAY_BUFFER="00:05:00"
 
 # Location to save recordings
 VIDEO_FOLDER=$(xdg-user-dir VIDEOS || echo "$HOME/Videos/")
@@ -107,7 +111,7 @@ case $ENCODER_API in
                 -thread_queue_size 32768 \
                 -f x11grab \
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
-                -r ${FPS} \
+                -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -f pulse -i default \
                 -ar 44100 \
@@ -120,7 +124,7 @@ case $ENCODER_API in
             ffmpeg \
                 -f pulse -i default \
                 -f x11grab \
-                -framerate ${FPS} \
+                -r "$FPS" \
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -c:v "$ENCODER" \
@@ -139,7 +143,7 @@ case $ENCODER_API in
                 -thread_queue_size 32768 \
                 -f x11grab \
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
-                -r ${FPS} \
+                -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -f pulse -ac 2 -i default \
                 -ar 44100 \
@@ -154,7 +158,7 @@ case $ENCODER_API in
                 -thread_queue_size 32768 \
                 -f x11grab \
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
-                -r ${FPS} \
+                -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -f pulse -i default \
                 -ar 44100 \
@@ -167,13 +171,14 @@ esac
 ffmpeg_command ||
 
 ffmpeg \
-    -sseof -$REPLAY_BUFFER \
+    -sseof -"$REPLAY_BUFFER" \
     -i /tmp/shadowplay.mp4 \
     -vcodec copy -acodec copy \
     "$FILE" -loglevel quiet &&
 
+notify-send -a "Shadowplay-Linux" -i "obs" "Recording successfully saved to $FILE" &&
 rm /tmp/shadowplay.mp4 &&
 
 cd "$BASEDIR" &&
     
-$0 -m $MONITOR_NUMBER
+$0 -m "$MONITOR_NUMBER" -f "$FPS" -b "$REPLAY_BUFFER"

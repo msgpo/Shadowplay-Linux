@@ -13,13 +13,13 @@ Shadowplay's replay feature on Linux
 
 ## Configuration
 
-- Change `FPS` to your desired recording framerate. Default is 60.
+- Use `-f` or `--framerate` to set your desired recording framerate. Default is 30.
 
-- Change `RESOLUTION` to your resolution. (X11 resolution). Default is 1920x1080.
+- Use `-m` or `--monitor-number` to chose the monitor to record
 
-- Change `REPLAY_BUFFER` to your desired save time. Default is 00:05:00 for 5min. 
+- Use `-b` or `--buffer` to chose your desired save time. Default is 00:05:00 for 5min.
 
-- Change `VIDEO_FOLDER` to the folder where you want replays saved. Default is ${HOME}/Videos/ (/home/YOUR_USER/Videos/)
+- Change `VIDEO_FOLDER` to the folder where you want replays to be saved. Default is your XDG Videos directory or as fallback `$HOME/Videos/`
 
 ## Setup
 
@@ -47,6 +47,7 @@ First, configure the key (or key combo) you want to use in order to save your re
 ## TODO
 - Systemd service/timer integration
 - Automatic deletion of video recorded older than the replay buffer
+- Add support for recording system sound
 
 ## Notes
 When recording for long intervals, it may take some time to save your replays.
