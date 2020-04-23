@@ -25,6 +25,8 @@ FPS="30"
 REPLAY_BUFFER="00:05:00"
 # Location to save recordings
 VIDEO_FOLDER=$(xdg-user-dir VIDEOS || echo "$HOME/Videos/")
+# Audio Mode
+AUDIO_MODE="none"
 
 while [ ! $# -eq 0 ]
 do
@@ -38,6 +40,7 @@ do
 			echo "-h,  --help               show help"
 			echo "-f,  --framerate=FPS      set framerate"
             echo "-l,  --location=FOLDER    set folder to save recordings"
+            echo "-a,  --audio=MODE         set audio mode (none,system,mic,both)"
 			echo "-b,  --buffer=TIME        set replay buffer size (format hh:mm:ss)"
 			echo "-m,  --monitor-number=NUM set monitor number"
 			exit
@@ -50,6 +53,9 @@ do
 		;;
         -l | --location)
 			VIDEO_FOLDER=$2
+		;;
+        -a | --audio)
+			AUDIO_MODE=$2
 		;;
 		-m | --monitor-number)
 			MONITOR_NUMBER=$2
@@ -103,6 +109,25 @@ fi
 
 BASEDIR=$(dirname "$0")
 
+AUDIO_ARGUMENT=""
+
+case "$AUDIO_MODE" in
+    none)
+		AUDIO_ARGUMENT=""
+	;;
+    system)
+		AUDIO_ARGUMENT=""
+        echo "\033[0;31mSystem is not implemented yet"
+	;;
+    mic)
+		AUDIO_ARGUMENT="-f pulse -ac 2 -i default"
+	;;
+    both)
+		AUDIO_ARGUMENT="-f pulse -ac 2 -i default"
+        echo "\033[0;31mSystem is not implemented yet"
+	;;
+esac
+
 DATE=$(date +%Y-%d-%m-%H:%M:%S)
 FILE="$VIDEO_FOLDER"/replay-"$DATE".mp4
 
@@ -116,7 +141,7 @@ case $ENCODER_API in
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
-                -f pulse -i default \
+                "$AUDIO_ARGUMENT" \
                 -ar 44100 \
                 -c:v "$ENCODER" -vf format='nv12|vaapi,hwupload' -vaapi_device /dev/dri/renderD128 \
                 -y \
@@ -125,7 +150,7 @@ case $ENCODER_API in
     "nvenc")    
         ffmpeg_command(){
             ffmpeg \
-                -f pulse -i default \
+                "$AUDIO_ARGUMENT" \
                 -f x11grab \
                 -r "$FPS" \
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
@@ -148,7 +173,7 @@ case $ENCODER_API in
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
-                -f pulse -ac 2 -i default \
+                "$AUDIO_ARGUMENT" \
                 -ar 44100 \
                 -c:v "$ENCODER" \
                 -y \
@@ -163,7 +188,7 @@ case $ENCODER_API in
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
-                -f pulse -i default \
+                "$AUDIO_ARGUMENT" \
                 -ar 44100 \
                 -c:v "$ENCODER" -preset medium \
                 -y \

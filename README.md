@@ -19,6 +19,8 @@ Shadowplay's replay feature on Linux
 
 - Use `-b` or `--buffer` to set your desired save time. Default is 00:05:00 for 5min.
 
+- Use `-a` or `--audio` to set your desired audio mode (`none`,`system`,`mic`,`both`). Default is `none`
+
 - Use `-l` or `--location` to set the folder where you want replays to be saved. Default is your XDG Videos directory or as fallback `$HOME/Videos/`
 
 ## Setup
