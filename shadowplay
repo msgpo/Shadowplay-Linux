@@ -1,16 +1,65 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
-# Resolution of your X session
-RESOLUTION="$(xdpyinfo | grep dimensions | awk '{print $2}')"
+# Dependency checking
+if ! [ -x "$(command -v xrandr)" ]
+then
+	echo "Error: xrandr is not installed."
+	exit 1
+fi
+
+if ! [ -x "$(command -v ffmpeg)" ]
+then
+	echo "Error: ffmpeg is not installed."
+	exit 1
+fi
+
+MONITOR_NUMBER=
+# Video Framerate
+FPS="30"
+
+while [ ! $# -eq 0 ]
+do
+	case "$1" in
+		-h | --help)
+			echo "$0 - Shadowplay On Linux"
+			echo ""
+			echo "$0 [options] [value]"
+			echo ""
+			echo "options:"
+			echo "-h,  --help               show help"
+			echo "-f,  --framerate=FPS      set framerate"
+			echo "-m,  --monitor-number=NUM set monitor number"
+			exit
+		;;
+		-f | --framerate)
+			FPS=$2
+		;;
+		-m | --monitor-number)
+			MONITOR_NUMBER=$2
+		;;
+	esac
+	shift
+done
+
+# Pick monitor
+if [ -z "$MONITOR_NUMBER" ]
+then
+	xrandr --listactivemonitors
+	read -r -p "Which monitor: " MONITOR_NUMBER
+fi
+
+# Monitor information
+MONITOR_INFO=$(xrandr --listactivemonitors | grep "$MONITOR_NUMBER:" | cut -f4 -d' ')
+MONITOR_HEIGHT=$(echo "$MONITOR_INFO" | cut -f2 -d'/' | cut -f2 -d'x')
+MONITOR_WIDTH=$(echo "$MONITOR_INFO" | cut -f1 -d'/')
+MONITOR_X=$(echo "$MONITOR_INFO" | cut -f2 -d'+')
+MONITOR_Y=$(echo "$MONITOR_INFO" | cut -f3 -d'+')
 
 # If you want to use CPU-encoding
 # instead, set to true.
-SOFTWARE_ENCODE=true
-
-# Video Framerate
-FPS="60" 
+SOFTWARE_ENCODE=false
 
 # Common encoders are:
 # h264
@@ -24,11 +73,9 @@ ENCODER_STANDARD=h264
 REPLAY_BUFFER="00:05:00"
 
 # Location to save recordings
-VIDEO_FOLDER="$HOME/Videos/"
+VIDEO_FOLDER=$(xdg-user-dir VIDEOS || echo "$HOME/Videos/")
 
-if [ -e "$VIDEO_FOLDER" ]; then
-    echo "Video directory already exists."
-else
+if [ ! -d "$VIDEO_FOLDER" ]; then
     mkdir "$VIDEO_FOLDER"
 fi
 
@@ -59,9 +106,9 @@ case $ENCODER_API in
                 -threads 0 \
                 -thread_queue_size 32768 \
                 -f x11grab \
-                -s "$RESOLUTION" \
+                -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r ${FPS} \
-                -i "$DISPLAY" \
+                -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -f pulse -i default \
                 -ar 44100 \
                 -c:v "$ENCODER" -vf format='nv12|vaapi,hwupload' -vaapi_device /dev/dri/renderD128 \
@@ -74,8 +121,8 @@ case $ENCODER_API in
                 -f pulse -i default \
                 -f x11grab \
                 -framerate ${FPS} \
-                -s "$RESOLUTION" \
-                -i "$DISPLAY" \
+                -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
+                -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -c:v "$ENCODER" \
                 -preset:v llhq \
                 -profile:v high \
@@ -91,9 +138,9 @@ case $ENCODER_API in
                 -threads 0 \
                 -thread_queue_size 32768 \
                 -f x11grab \
-                -s "$RESOLUTION" \
+                -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r ${FPS} \
-                -i "$DISPLAY" \
+                -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -f pulse -ac 2 -i default \
                 -ar 44100 \
                 -c:v "$ENCODER" \
@@ -106,9 +153,9 @@ case $ENCODER_API in
                 -threads 0 \
                 -thread_queue_size 32768 \
                 -f x11grab \
-                -s "$RESOLUTION" \
+                -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r ${FPS} \
-                -i "$DISPLAY" \
+                -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
                 -f pulse -i default \
                 -ar 44100 \
                 -c:v "$ENCODER" -preset medium \
@@ -129,4 +176,4 @@ rm /tmp/shadowplay.mp4 &&
 
 cd "$BASEDIR" &&
     
-./shadowplay
+$0 -m $MONITOR_NUMBER
