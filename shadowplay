@@ -209,4 +209,4 @@ rm /tmp/shadowplay.mp4 &&
 
 cd "$BASEDIR" &&
     
-$0 -m "$MONITOR_NUMBER" -f "$FPS" -b "$REPLAY_BUFFER" -f "$VIDEO_FOLDER"
+$0 -m "$MONITOR_NUMBER" -f "$FPS" -b "$REPLAY_BUFFER" -f "$VIDEO_FOLDER" -a "$AUDIO_MODE"
