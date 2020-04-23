@@ -23,6 +23,8 @@ FPS="30"
 # Format is
 #     hh:mm:ss
 REPLAY_BUFFER="00:05:00"
+# Location to save recordings
+VIDEO_FOLDER=$(xdg-user-dir VIDEOS || echo "$HOME/Videos/")
 
 while [ ! $# -eq 0 ]
 do
@@ -35,6 +37,7 @@ do
 			echo "options:"
 			echo "-h,  --help               show help"
 			echo "-f,  --framerate=FPS      set framerate"
+            echo "-l,  --location=FOLDER      set folder to save recordings"
 			echo "-b,  --buffer=TIME      set replay buffer size (format hh:mm:ss)"
 			echo "-m,  --monitor-number=NUM set monitor number"
 			exit
@@ -44,6 +47,9 @@ do
 		;;
         -b | --buffer)
 			REPLAY_BUFFER=$2
+		;;
+        -l | --location)
+			VIDEO_FOLDER=$2
 		;;
 		-m | --monitor-number)
 			MONITOR_NUMBER=$2
@@ -75,9 +81,6 @@ SOFTWARE_ENCODE=false
 # hevc
 # h265
 ENCODER_STANDARD=h264
-
-# Location to save recordings
-VIDEO_FOLDER=$(xdg-user-dir VIDEOS || echo "$HOME/Videos/")
 
 if [ ! -d "$VIDEO_FOLDER" ]; then
     mkdir "$VIDEO_FOLDER"
@@ -181,4 +184,4 @@ rm /tmp/shadowplay.mp4 &&
 
 cd "$BASEDIR" &&
     
-$0 -m "$MONITOR_NUMBER" -f "$FPS" -b "$REPLAY_BUFFER"
+$0 -m "$MONITOR_NUMBER" -f "$FPS" -b "$REPLAY_BUFFER" -f "$VIDEO_FOLDER"

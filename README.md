@@ -15,11 +15,11 @@ Shadowplay's replay feature on Linux
 
 - Use `-f` or `--framerate` to set your desired recording framerate. Default is 30.
 
-- Use `-m` or `--monitor-number` to chose the monitor to record
+- Use `-m` or `--monitor-number` to set the monitor to record
 
-- Use `-b` or `--buffer` to chose your desired save time. Default is 00:05:00 for 5min.
+- Use `-b` or `--buffer` to set your desired save time. Default is 00:05:00 for 5min.
 
-- Change `VIDEO_FOLDER` to the folder where you want replays to be saved. Default is your XDG Videos directory or as fallback `$HOME/Videos/`
+- Use `-l` or `--location` to set the folder where you want replays to be saved. Default is your XDG Videos directory or as fallback `$HOME/Videos/`
 
 ## Setup
 
@@ -53,5 +53,6 @@ First, configure the key (or key combo) you want to use in order to save your re
 When recording for long intervals, it may take some time to save your replays.
 
 Heavily inspired by [Toqozz's script](https://github.com/Toqozz/shadowplay-linux).
+It is also inspired by [Mon2Cam](https://github.com/ShayBox/Mon2Cam/).
 
 Thank you [Tyler](https://github.com/durcor) for answering my stupid questions while making this.
