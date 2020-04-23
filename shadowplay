@@ -37,8 +37,8 @@ do
 			echo "options:"
 			echo "-h,  --help               show help"
 			echo "-f,  --framerate=FPS      set framerate"
-            echo "-l,  --location=FOLDER      set folder to save recordings"
-			echo "-b,  --buffer=TIME      set replay buffer size (format hh:mm:ss)"
+            echo "-l,  --location=FOLDER    set folder to save recordings"
+			echo "-b,  --buffer=TIME        set replay buffer size (format hh:mm:ss)"
 			echo "-m,  --monitor-number=NUM set monitor number"
 			exit
 		;;

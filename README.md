@@ -46,7 +46,7 @@ First, configure the key (or key combo) you want to use in order to save your re
 
 ## TODO
 - Systemd service/timer integration
-- Automatic deletion of video recorded older than the replay buffer
+- Automatic deletion of video recorded older than the replay buffer (currently the temp file has the complete recording stored)
 - Add support for recording system sound
 
 ## Notes
