@@ -109,20 +109,20 @@ fi
 
 BASEDIR=$(dirname "$0")
 
-AUDIO_ARGUMENT=""
+AUDIO_ARGUMENT=
 
 case "$AUDIO_MODE" in
-    none)
+    "none")
 		AUDIO_ARGUMENT=""
 	;;
-    system)
+    "system")
 		AUDIO_ARGUMENT=""
         echo "\033[0;31mSystem is not implemented yet"
 	;;
-    mic)
+    "mic")
 		AUDIO_ARGUMENT="-f pulse -ac 2 -i default"
 	;;
-    both)
+    "both")
 		AUDIO_ARGUMENT="-f pulse -ac 2 -i default"
         echo "\033[0;31mSystem is not implemented yet"
 	;;
@@ -141,7 +141,6 @@ case $ENCODER_API in
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
-                "$AUDIO_ARGUMENT" \
                 -ar 44100 \
                 -c:v "$ENCODER" -vf format='nv12|vaapi,hwupload' -vaapi_device /dev/dri/renderD128 \
                 -y \
@@ -150,7 +149,6 @@ case $ENCODER_API in
     "nvenc")    
         ffmpeg_command(){
             ffmpeg \
-                "$AUDIO_ARGUMENT" \
                 -f x11grab \
                 -r "$FPS" \
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
@@ -173,7 +171,6 @@ case $ENCODER_API in
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
-                "$AUDIO_ARGUMENT" \
                 -ar 44100 \
                 -c:v "$ENCODER" \
                 -y \
@@ -188,7 +185,6 @@ case $ENCODER_API in
                 -s "$MONITOR_WIDTH"x"$MONITOR_HEIGHT" \
                 -r "$FPS" \
                 -i "$DISPLAY"+"$MONITOR_X","$MONITOR_Y" \
-                "$AUDIO_ARGUMENT" \
                 -ar 44100 \
                 -c:v "$ENCODER" -preset medium \
                 -y \
